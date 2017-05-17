@@ -1,0 +1,6 @@
+mainClassName = 'daggerok.ZipkinServerApplicationKt'
+
+dependencies {
+    compile('org.springframework.cloud:spring-cloud-sleuth-zipkin-stream')
+    runtime('io.zipkin.java:zipkin-autoconfigure-ui')
+}
