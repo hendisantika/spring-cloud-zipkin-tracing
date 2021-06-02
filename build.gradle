@@ -1,57 +1,46 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    id 'java'
-    id 'idea'
-    id 'eclipse'
-    id 'org.jetbrains.kotlin.jvm' version '1.1.2-2'
-    id 'org.jetbrains.kotlin.plugin.jpa' version '1.1.2-2'
-    id 'org.jetbrains.kotlin.plugin.noarg' version '1.1.2-2'
-    id 'org.jetbrains.kotlin.plugin.spring' version '1.1.2-2'
-    id 'org.jetbrains.kotlin.plugin.allopen' version '1.1.2-2'
-    id 'org.springframework.boot' version '2.5.0'
+    id("org.springframework.boot") version "2.5.0"
+    id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    kotlin("jvm") version "1.5.10"
+    kotlin("plugin.spring") version "1.5.10"
 }
 
-group 'daggerok'
-version '0.0.1'
+group = "com.hendisantika"
+version = "0.0.1-SNAPSHOT"
+java.sourceCompatibility = JavaVersion.VERSION_11
 
-bootRepackage { enabled = false }
+repositories {
+    mavenCentral()
+}
 
-subprojects {
+extra["springCloudVersion"] = "2020.0.3"
 
-    apply plugin: 'kotlin'
-    apply plugin: 'kotlin-jpa'
-    apply plugin: 'application'
-    apply plugin: 'kotlin-noarg'
-    apply plugin: 'kotlin-spring'
-    apply plugin: 'kotlin-allopen'
-    apply plugin: 'org.springframework.boot'
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.springframework.cloud:spring-cloud-sleuth-zipkin")
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-server")
+    implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.amqp:spring-rabbit-test")
+}
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    compileKotlin { kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8 }
-    compileTestKotlin { kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8 }
-
-    repositories { mavenCentral() }
-
-    ext {
-        kotlinVersion = '1.1.2-2'
-        springBootVersion = '1.5.3.RELEASE'
-        springCloudVersion = 'Dalston.RELEASE'
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
     }
+}
 
-    dependencies {
-        compile 'org.springframework.cloud:spring-cloud-starter-eureka',
-                'org.springframework.cloud:spring-cloud-starter-stream-rabbit',
-                'org.springframework.cloud:spring-cloud-sleuth-zipkin-stream',
-                "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion",
-                "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-        testCompile('org.springframework.boot:spring-boot-starter-test')
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict")
+        jvmTarget = "11"
     }
+}
 
-    springBoot { executable = true }
-
-    dependencyManagement {
-        imports {
-            mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
-        }
-    }
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
